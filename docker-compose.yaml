@@ -1,4 +1,12 @@
 services:
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - BASE_URL="http://server:8000/"
+
   server:
     build:
       context: ./backend

@@ -13,6 +13,7 @@ const todoCreationSchema = Joi.object({
 });
 
 const todoUpdateSchema = Joi.object({
+  id: Joi.number().integer().required(), // Assuming id is a required integer
   name: Joi.string().min(1).max(100),
   shortDescription: Joi.string().max(250),
   dateAndTime: Joi.date().greater("now"),
