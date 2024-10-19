@@ -19,6 +19,13 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Todo {
   id: number;
@@ -43,14 +50,19 @@ export default function TodoApp() {
   );
   const [editingTodoTime, setEditingTodoTime] = useState("");
   const [error, setError] = useState("");
+  const [filter, setFilter] = useState("all");
 
   useEffect(() => {
     fetchTodos();
-  }, []);
+  }, [filter]);
 
   const fetchTodos = async () => {
     try {
-      const response = await fetch("http://localhost:8003/api/todos/");
+      let url = "http://localhost:8003/api/todos/";
+      if (filter !== "all") {
+        url += `?status=${filter}`;
+      }
+      const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to fetch todos");
       const result = await response.json();
       setTodos(result.data);
@@ -146,7 +158,6 @@ export default function TodoApp() {
     const [hours, minutes] = editingTodoTime.split(":");
     dateTime.setHours(parseInt(hours, 10), parseInt(minutes, 10));
 
-    // Create the updated todo object without createdAt and updatedAt
     const updatedTodoItem = {
       id: editingTodo.id,
       name: editingTodo.name,
@@ -163,12 +174,12 @@ export default function TodoApp() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(updatedTodoItem), // Only send relevant fields
+          body: JSON.stringify(updatedTodoItem),
         }
       );
 
       if (!response.ok) {
-        const errorData = await response.json(); // Capture error message from server response
+        const errorData = await response.json();
         console.error("Error from server:", errorData);
         throw new Error(`Error: ${response.status} - ${response.statusText}`);
       }
@@ -236,6 +247,19 @@ export default function TodoApp() {
         <Button onClick={addTodo}>Add</Button>
       </div>
       {error && <p className="text-red-500 mb-2">{error}</p>}
+      <div className="mb-4">
+        <Select onValueChange={setFilter} defaultValue="all">
+          <SelectTrigger className="w-full text-black">
+            <SelectValue placeholder="Filter todos" />
+          </SelectTrigger>
+          <SelectContent className="text-black">
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="pending">Pending</SelectItem>
+            <SelectItem value="completed">Completed</SelectItem>
+            <SelectItem value="upcoming">Upcoming</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
       {todos && todos.length > 0 ? (
         <ul className="space-y-2">
           {todos.map((todo) => (
