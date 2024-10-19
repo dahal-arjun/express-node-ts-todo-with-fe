@@ -21,6 +21,9 @@ It should work like magic. If not have to configure the project.
     docker-compose up --build -d
 ```
 
+go to the http://localhost:3000 for frontend\
+and backend is http://localhost:8003 or the port you have changed.
+
 ### Architecture and Design Decisions For Backend
 
 - I have used the MVC pattern.\
