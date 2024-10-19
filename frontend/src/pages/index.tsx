@@ -26,6 +26,8 @@ interface Todo {
   shortDescription: string;
   dateAndTime: string;
   status: "pending" | "completed";
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export default function TodoApp() {
@@ -144,9 +146,13 @@ export default function TodoApp() {
     const [hours, minutes] = editingTodoTime.split(":");
     dateTime.setHours(parseInt(hours, 10), parseInt(minutes, 10));
 
+    // Create the updated todo object without createdAt and updatedAt
     const updatedTodoItem = {
-      ...editingTodo,
+      id: editingTodo.id,
+      name: editingTodo.name,
+      shortDescription: editingTodo.shortDescription,
       dateAndTime: dateTime.toISOString(),
+      status: editingTodo.status,
     };
 
     try {
@@ -157,11 +163,15 @@ export default function TodoApp() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(updatedTodoItem),
+          body: JSON.stringify(updatedTodoItem), // Only send relevant fields
         }
       );
 
-      if (!response.ok) throw new Error("Failed to update todo");
+      if (!response.ok) {
+        const errorData = await response.json(); // Capture error message from server response
+        console.error("Error from server:", errorData);
+        throw new Error(`Error: ${response.status} - ${response.statusText}`);
+      }
 
       await fetchTodos();
       closeEditDialog();
