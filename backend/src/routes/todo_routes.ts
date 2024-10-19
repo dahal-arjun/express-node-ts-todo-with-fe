@@ -31,7 +31,7 @@ const todoController = new TodoController(todoService);
  *                 format: date-time
  *               status:
  *                 type: string
- *                 enum: [pending, completed]
+ *                 enum: [pending, completed, upcoming]
  *     responses:
  *       201:
  *         description: Todo created
